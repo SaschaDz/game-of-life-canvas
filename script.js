@@ -3,19 +3,18 @@ var ctx = canvas.getContext("2d");
 ctx.fillStyle = "grey";
 const cellWidth = 25;
 const cellHeight = 25;
-const cols = Math.floor(canvas.width/cellWidth)+1;
-const rows = Math.floor(canvas.height/cellHeight);
+const cols = Math.floor(canvas.width/cellWidth);
+const rows = Math.floor(canvas.height/cellHeight)+2;
 
 var cells = [];
 
 // generate cells array
 for (r=0;r<rows;r++) {
-    for (c=0;c<cols+1;c++) {
+    for (c=0;c<cols;c++) {
         var cell = {
-            x: c*cellWidth+1-cellWidth,
-            y: r*cellHeight+1,
+            x: c*cellWidth+1,
+            y: r*cellHeight+1-cellHeight,
             status: 0,
-            id: c+r+1,
         };
         cells.push(cell);
     }
@@ -26,6 +25,7 @@ generateCells();
 function generateCells() {
     for (i=0;i<cells.length-1;i++) {
         var cell = cells[i];
+        cell.id = i - 39;
         ctx.fillRect(cell.x,cell.y,cellWidth-1,cellHeight-1);
         if (cells[i+1].status == 1) {
             ctx.fillStyle = "green";
