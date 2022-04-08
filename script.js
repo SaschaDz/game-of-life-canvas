@@ -9,6 +9,7 @@ To-Do:
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 const cellColorDead = "rgb(231, 231, 231)";
+const cellColorLive = "green";
 ctx.fillStyle = cellColorDead;
 var cellSize = 25;
 var cols = 100;
@@ -16,12 +17,13 @@ var rows = 100;
 var generations = 0;
 const genDisplay = document.getElementById("gens");
 var cells = [];
+var liveCells = 0;
 var simSpeed = 100;
 
 // show count of generations
 displayGenerationCount();
 function displayGenerationCount() {
-    genDisplay.innerText = `generation: ${generations}`;
+    genDisplay.innerText = `generation: ${generations} cells alive: ${liveCells}`;
 }
 
 // generate cells array
@@ -46,35 +48,41 @@ function createCellsArray() {
 
 // create cells on canvas
 function generateCells() {
+    liveCells = 0;
     for (var i=0;i<cells.length-1;i++) {
         var cell = cells[i];
         cell.nAlive = 0;
         ctx.fillRect(cell.x,cell.y,cellSize-1,cellSize-1);
         if (cells[i+1].status == 1) {
-            ctx.fillStyle = "green";
+            ctx.fillStyle = cellColorLive;
+            liveCells++;
             ctx.fill();
         } else 
             ctx.fillStyle = cellColorDead;
             ctx.fill();
     }
+    if (liveCells == 0) {
+        displayGenerationCount();
+        stopSim();
+    }
 }
 
 // make cells interactive
-canvas.addEventListener("mousedown", function(e) { 
+canvas.addEventListener("click", function(e) { 
     for (i=0;i<cells.length;i++) {
         var cell = cells[i];
-        var cRect = canvas.getBoundingClientRect();        // Gets CSS pos, and width/height
-        var mouseX = Math.round(e.clientX - cRect.left);  // Subtract the 'left' of the canvas 
-        var mouseY = Math.round(e.clientY - cRect.top);   // from the X/Y positions to make  
+        var cRect = canvas.getBoundingClientRect();
+        var mouseX = Math.round(e.clientX - cRect.left);
+        var mouseY = Math.round(e.clientY - cRect.top);
         //document.getElementById("gens").innerText = `MouseX: ${mouseX} MouseY: ${mouseY} CellX: ${cell.x} CellX+W: ${cell.x+cellSize} cellY: ${cell.y} cellY+H: ${cell.y+cellSize}`;
-        if (mouseX > cell.x && mouseX < (cell.x + cellSize) && mouseY > cell.y && mouseY < (cell.y + cellSize)) {
-            if (cell.status == 0) {
-                cell.status = 1;
-            } else
-            cell.status = 0;
-            //console.log(`clicked cell:${i} new status:${cell.status} nAlive:${cell.nAlive}`);
-            generateCells();
-        }
+            if (mouseX > cell.x && mouseX < (cell.x + cellSize) && mouseY > cell.y && mouseY < (cell.y + cellSize)) {
+                if (cell.status == 0) {
+                    cell.status = 1;
+                } else
+                cell.status = 0;
+                //console.log(`clicked cell:${i} new status:${cell.status} nAlive:${cell.nAlive}`);
+                generateCells();
+            }
     }
 })
 
@@ -168,7 +176,7 @@ function increaseSpeed() {
 }
 
 function increaseCellSize() {
-    if (cellSize < 100) {
+    if (cellSize < 100 && runSimInterval == 0) {
         cellSize += 5;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         createCellsArray();
@@ -176,7 +184,7 @@ function increaseCellSize() {
 }
 
 function decreaseCellSize() {
-    if (cellSize > 10) {
+    if (cellSize > 10 && runSimInterval == 0) {
         cellSize -= 5;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         createCellsArray();
