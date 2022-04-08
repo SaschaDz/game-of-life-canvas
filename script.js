@@ -1,20 +1,28 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 ctx.fillStyle = "grey";
-const cellWidth = 25;
-const cellHeight = 25;
-const cols = Math.floor(canvas.width/cellWidth);
-const rows = Math.floor(canvas.height/cellHeight)+2;
+const cellSize = 20;
 
+const cols = Math.floor(canvas.width/cellSize);
+const rows = Math.floor(canvas.height/cellSize)+2;
+var generations = 0;
+const genDisplay = document.getElementById("gens");
 var cells = [];
 
+// show count of generations
+displayGenerationCount();
+function displayGenerationCount() {
+    genDisplay.innerText = `generations: ${generations}`;
+}
+
 // generate cells array
-for (r=0;r<rows;r++) {
-    for (c=0;c<cols;c++) {
+for (var r=0;r<rows;r++) {
+    for (var c=0;c<cols;c++) {
         var cell = {
-            x: c*cellWidth+1,
-            y: r*cellHeight+1-cellHeight,
+            x: c*cellSize+1,
+            y: r*cellSize+1-cellSize,
             status: 0,
+            nAlive: 0
         };
         cells.push(cell);
     }
@@ -23,10 +31,11 @@ for (r=0;r<rows;r++) {
 // create cells on canvas
 generateCells();
 function generateCells() {
-    for (i=0;i<cells.length-1;i++) {
+    for (var i=0;i<cells.length-1;i++) {
         var cell = cells[i];
-        cell.id = i - 39;
-        ctx.fillRect(cell.x,cell.y,cellWidth-1,cellHeight-1);
+        cell.id = i - cols+1;
+        cell.nAlive = 0;
+        ctx.fillRect(cell.x,cell.y,cellSize-1,cellSize-1);
         if (cells[i+1].status == 1) {
             ctx.fillStyle = "green";
             ctx.fill();
@@ -36,31 +45,84 @@ function generateCells() {
     }
 }
 
-
-function clearCells() {
-    for (i=0;i<cells.length;i++) {
-        var cell = cells[i];
-        cell.status = 0;
-        generateCells();
-    }
-}
-
-// make cells clickable
-canvas.addEventListener("click", function(e) { 
+// make cells interactive
+canvas.addEventListener("mousedown", function(e) { 
     for (i=0;i<cells.length;i++) {
         var cell = cells[i];
         var cRect = canvas.getBoundingClientRect();        // Gets CSS pos, and width/height
         var mouseX = Math.round(e.clientX - cRect.left);  // Subtract the 'left' of the canvas 
         var mouseY = Math.round(e.clientY - cRect.top);   // from the X/Y positions to make  
-        //document.getElementById("gens").innerText = `MouseX: ${mouseX} MouseY: ${mouseY} CellX: ${cell.x} CellX+W: ${cell.x+cellHeight} cellY: ${cell.y} cellY+H: ${cell.y+cellHeight}`;
-        if (mouseX > cell.x && mouseX < (cell.x + cellWidth) && mouseY > cell.y && mouseY < (cell.y + cellHeight)) {
+        //document.getElementById("gens").innerText = `MouseX: ${mouseX} MouseY: ${mouseY} CellX: ${cell.x} CellX+W: ${cell.x+cellSize} cellY: ${cell.y} cellY+H: ${cell.y+cellSize}`;
+        if (mouseX > cell.x && mouseX < (cell.x + cellSize) && mouseY > cell.y && mouseY < (cell.y + cellSize)) {
             if (cell.status == 0) {
                 cell.status = 1;
             } else
             cell.status = 0;
-            console.log(`clicked cell: ${cell.id} new status: ${cell.status}`);
+            console.log(`clicked cell:${i} id:${cell.id} new status:${cell.status} nAlive:${cell.nAlive}`);
             generateCells();
         }
     }
 });
 
+
+function checkNeighbours() {
+    for (var i=0;i<cells.length-1;i++) {
+        var cell = cells[i];
+        const nbs = [
+            cells[i - cols],
+            cells[i - cols + 1],
+            cells[i + 1],
+            cells[i + cols + 1],
+            cells[i + cols],
+            cells[i + cols - 1],
+            cells[i - 1],
+            cells[i - cols - 1]
+        ]; 
+        for (var j=0;j<nbs.length;j++) {
+            if (!!nbs[j]) {
+                if (nbs[j].status == 1) {
+                    cell.nAlive++;
+                }
+            }
+        }
+    }
+    nextGeneration();
+}
+
+function nextGeneration() {
+    generations++;
+    displayGenerationCount();
+    for (const cell of cells) {
+        if (cell.nAlive <= 1) {
+            cell.status = 0;
+        } else if (cell.nAlive >= 4) {
+            cell.status = 0;
+        } else if (cell.nAlive == 3) {
+            cell.status = 1;
+        }
+    }
+    generateCells();
+}
+
+// set status of all cells to 0 and re-generate them
+function clearCells() {
+    stopSim();
+    generations = 0;
+    for (var i=0;i<cells.length;i++) {
+        cells[i].status = 0;
+    }
+    generateCells();
+    displayGenerationCount();
+}
+
+var runSimInterval = 0;
+function startSim() {
+    if (runSimInterval == 0) {
+        runSimInterval = setInterval(checkNeighbours, 200);
+    }
+}
+
+function stopSim() {
+    clearInterval(runSimInterval);
+    runSimInterval = 0;
+}

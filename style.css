@@ -19,8 +19,9 @@ header {
     padding: 1rem;
 }
 
-h1 {
+h1, h2 {
     text-align: center;
+    margin: 5px;
 }
 
 .game-area {
