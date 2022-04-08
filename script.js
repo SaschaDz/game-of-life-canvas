@@ -1,35 +1,45 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-ctx.fillStyle = "grey";
-const cellSize = 20;
-
-const cols = Math.floor(canvas.width/cellSize);
-const rows = Math.floor(canvas.height/cellSize)+2;
+const cellColorDead = "rgb(231, 231, 231)";
+ctx.fillStyle = cellColorDead;
+var cellSize = 10;
+var cols = Math.floor(canvas.width/cellSize);
+var rows = Math.floor(canvas.height/cellSize)+2;
 var generations = 0;
 const genDisplay = document.getElementById("gens");
 var cells = [];
+var simSpeed = 200;
+const intervalSlider = document.getElementById("intervalSlider");
 
 // show count of generations
 displayGenerationCount();
 function displayGenerationCount() {
-    genDisplay.innerText = `generations: ${generations}`;
+    genDisplay.innerText = `generation: ${generations}`;
 }
 
 // generate cells array
-for (var r=0;r<rows;r++) {
-    for (var c=0;c<cols;c++) {
-        var cell = {
-            x: c*cellSize+1,
-            y: r*cellSize+1-cellSize,
-            status: 0,
-            nAlive: 0
-        };
-        cells.push(cell);
-    }
-};
+createCellsArray();
+function createCellsArray() {
+    cols = Math.floor(canvas.width/cellSize);
+    rows = Math.floor(canvas.height/cellSize)+2;
+    cells = [];
+    for (var r=0;r<rows;r++) {
+        for (var c=0;c<cols;c++) {
+            var cell = {
+                x: c*cellSize+1,
+                y: r*cellSize+1-cellSize,
+                status: 0,
+                nAlive: 0
+            };
+            cells.push(cell);
+        }
+    };
+    displayGenerationCount();
+    generateCells();
+}
+
 
 // create cells on canvas
-generateCells();
 function generateCells() {
     for (var i=0;i<cells.length-1;i++) {
         var cell = cells[i];
@@ -40,7 +50,7 @@ function generateCells() {
             ctx.fillStyle = "green";
             ctx.fill();
         } else 
-            ctx.fillStyle = "grey";
+            ctx.fillStyle = cellColorDead;
             ctx.fill();
     }
 }
@@ -118,11 +128,25 @@ function clearCells() {
 var runSimInterval = 0;
 function startSim() {
     if (runSimInterval == 0) {
-        runSimInterval = setInterval(checkNeighbours, 200);
+        runSimInterval = setInterval(checkNeighbours, simSpeed);
     }
 }
 
 function stopSim() {
     clearInterval(runSimInterval);
     runSimInterval = 0;
+}
+
+function decreaseSpeed() {
+    if (simSpeed >= 50 && simSpeed <2000 && runSimInterval == 0) {
+        simSpeed += 10;
+        displayGenerationCount();
+    }
+}
+
+function increaseSpeed() {
+    if (simSpeed > 50 && simSpeed <=2000 && runSimInterval == 0) {
+        simSpeed -= 10;
+        displayGenerationCount();
+    }
 }
