@@ -2,21 +2,21 @@
 To-Do:
 - zoom in/out without loosing cell status
 - paning
-- consecutive drawing of cells instead of having to click each and ervy cell
+- continous drawing of cells instead of having to click each and every cell seperately
 - make site responsive
 */
+
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 const cellColorDead = "rgb(231, 231, 231)";
 ctx.fillStyle = cellColorDead;
 var cellSize = 25;
-var cols = Math.floor(canvas.width/cellSize);
-var rows = Math.floor(canvas.height/cellSize);
+var cols = 100;
+var rows = 100;
 var generations = 0;
 const genDisplay = document.getElementById("gens");
 var cells = [];
 var simSpeed = 100;
-const intervalSlider = document.getElementById("intervalSlider");
 
 // show count of generations
 displayGenerationCount();
@@ -27,8 +27,6 @@ function displayGenerationCount() {
 // generate cells array
 createCellsArray();
 function createCellsArray() {
-    cols = Math.floor(canvas.width/cellSize)+10;
-    rows = Math.floor(canvas.height/cellSize)+10;
     cells = [];
     for (var r=0;r<rows;r++) {
         for (var c=0;c<cols;c++) {
@@ -62,7 +60,6 @@ function generateCells() {
 }
 
 // make cells interactive
-
 canvas.addEventListener("mousedown", function(e) { 
     for (i=0;i<cells.length;i++) {
         var cell = cells[i];
@@ -75,12 +72,13 @@ canvas.addEventListener("mousedown", function(e) {
                 cell.status = 1;
             } else
             cell.status = 0;
-            console.log(`clicked cell:${i} new status:${cell.status} nAlive:${cell.nAlive}`);
+            //console.log(`clicked cell:${i} new status:${cell.status} nAlive:${cell.nAlive}`);
             generateCells();
         }
     }
 })
 
+// define neighbouring cells (horizontal, vertical and diagonal) and count the ones with status 1
 function checkNeighbours() {
     for (var i=0;i<cells.length-1;i++) {
         var cell = cells[i];
@@ -105,11 +103,19 @@ function checkNeighbours() {
     nextGeneration();
 }
 
+/* 
+Determine a cell's status debending on the number of live neighbours.
+Here, John Comway's rules com into play:
+- Any live cell with less than 2 live neighbours dies.
+- Any live cell with 2 or 3 live neighbours survives.
+- Any live cell with more than 3 live neighbours dies.
+- Any dead cell with with 3 live neighbours becomes a live cell.
+*/
 function nextGeneration() {
     generations++;
     displayGenerationCount();
     for (const cell of cells) {
-        if (cell.nAlive <= 1) {
+        if (cell.nAlive < 2) {
             cell.status = 0;
         } else if (cell.nAlive >= 4) {
             cell.status = 0;
