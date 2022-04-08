@@ -2,13 +2,13 @@ var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 const cellColorDead = "rgb(231, 231, 231)";
 ctx.fillStyle = cellColorDead;
-var cellSize = 10;
+var cellSize = 25;
 var cols = Math.floor(canvas.width/cellSize);
-var rows = Math.floor(canvas.height/cellSize)+2;
+var rows = Math.floor(canvas.height/cellSize);
 var generations = 0;
 const genDisplay = document.getElementById("gens");
 var cells = [];
-var simSpeed = 200;
+var simSpeed = 100;
 const intervalSlider = document.getElementById("intervalSlider");
 
 // show count of generations
@@ -20,8 +20,8 @@ function displayGenerationCount() {
 // generate cells array
 createCellsArray();
 function createCellsArray() {
-    cols = Math.floor(canvas.width/cellSize);
-    rows = Math.floor(canvas.height/cellSize)+2;
+    cols = Math.floor(canvas.width/cellSize)+10;
+    rows = Math.floor(canvas.height/cellSize)+10;
     cells = [];
     for (var r=0;r<rows;r++) {
         for (var c=0;c<cols;c++) {
@@ -43,7 +43,6 @@ function createCellsArray() {
 function generateCells() {
     for (var i=0;i<cells.length-1;i++) {
         var cell = cells[i];
-        cell.id = i - cols+1;
         cell.nAlive = 0;
         ctx.fillRect(cell.x,cell.y,cellSize-1,cellSize-1);
         if (cells[i+1].status == 1) {
@@ -56,6 +55,7 @@ function generateCells() {
 }
 
 // make cells interactive
+
 canvas.addEventListener("mousedown", function(e) { 
     for (i=0;i<cells.length;i++) {
         var cell = cells[i];
@@ -68,12 +68,11 @@ canvas.addEventListener("mousedown", function(e) {
                 cell.status = 1;
             } else
             cell.status = 0;
-            console.log(`clicked cell:${i} id:${cell.id} new status:${cell.status} nAlive:${cell.nAlive}`);
+            console.log(`clicked cell:${i} new status:${cell.status} nAlive:${cell.nAlive}`);
             generateCells();
         }
     }
-});
-
+})
 
 function checkNeighbours() {
     for (var i=0;i<cells.length-1;i++) {
@@ -138,15 +137,35 @@ function stopSim() {
 }
 
 function decreaseSpeed() {
-    if (simSpeed >= 50 && simSpeed <2000 && runSimInterval == 0) {
-        simSpeed += 10;
-        displayGenerationCount();
+    if (simSpeed <4000) {
+        simSpeed += 50;
+        clearInterval(runSimInterval);
+        runSimInterval = 0;
+        startSim();
     }
 }
 
 function increaseSpeed() {
-    if (simSpeed > 50 && simSpeed <=2000 && runSimInterval == 0) {
-        simSpeed -= 10;
-        displayGenerationCount();
+    if (simSpeed > 50) {
+        simSpeed -= 50;
+        clearInterval(runSimInterval);
+        runSimInterval = 0;
+        startSim();
+    }
+}
+
+function increaseCellSize() {
+    if (cellSize < 100) {
+        cellSize += 5;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        createCellsArray();
+    }
+}
+
+function decreaseCellSize() {
+    if (cellSize > 10) {
+        cellSize -= 5;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        createCellsArray();
     }
 }

@@ -51,15 +51,11 @@ button {
     min-width: 40px;
 }
 
-.speed {
+.speed,.size {
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.speed>p {
-    margin: 5px;
 }
 
 footer {
