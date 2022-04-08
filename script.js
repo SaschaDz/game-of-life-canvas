@@ -1,3 +1,10 @@
+/*
+To-Do:
+- zoom in/out without loosing cell status
+- paning
+- consecutive drawing of cells instead of having to click each and ervy cell
+- make site responsive
+*/
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 const cellColorDead = "rgb(231, 231, 231)";
