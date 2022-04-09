@@ -1,14 +1,13 @@
 /*
 To-Do:
-- zoom in/out without loosing cell status
+- persistent zoom
 - paning
-- continous drawing of cells instead of having to click each and every cell seperately
 - make site responsive
 */
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-const cellColorDead = "rgb(231, 231, 231)";
+const cellColorDead = "rgb(244, 244, 244)";
 const cellColorLive = "green";
 ctx.fillStyle = cellColorDead;
 var cellSize = 25;
@@ -21,22 +20,41 @@ var liveCells = 0;
 var simSpeed = 100;
 var drawModeCheck = 0;
 var drawModeFill = 1;
+const defaultBtnColor = "rgb(217, 242, 248)";
 const drawBtn = document.getElementById("draw");
 const eraseBtn = document.getElementById("erase");
+const nextBtn = document.getElementById("next");
+const resetBtn = document.getElementById("reset");
+const startBtn = document.getElementById("start");
+const pauseBtn = document.getElementById("pause");
 drawBtn.style.backgroundColor = "green";
 
-// switch between draw and erase mode
+
+// Eventlisteners for control buttons
 drawBtn.addEventListener("click", function() {
     drawModeCheck = 0;
     drawModeFill = 1;
     drawBtn.style.backgroundColor = "green";
-    eraseBtn.style.backgroundColor = "white";
+    eraseBtn.style.backgroundColor = defaultBtnColor
 });
 eraseBtn.addEventListener("click", function() {
     drawModeCheck = 1;
     drawModeFill = 0;
     eraseBtn.style.backgroundColor = "red";
-    drawBtn.style.backgroundColor = "white";
+    drawBtn.style.backgroundColor = defaultBtnColor
+});
+resetBtn.addEventListener("click", function() {
+    clearCells();
+});
+nextBtn.addEventListener("click", function() {
+    stopSim();
+    checkNeighbours();
+});
+startBtn.addEventListener("click", function() {
+    startSim();
+});
+pauseBtn.addEventListener("click", function() {
+    stopSim();
 });
 
 // show count of generations
@@ -186,7 +204,7 @@ function clearCells() {
     drawModeCheck = 0;
     drawModeFill = 1;
     drawBtn.style.backgroundColor = "green";
-    eraseBtn.style.backgroundColor = "white";
+    eraseBtn.style.backgroundColor = defaultBtnColor
     generateCells();
     displayGenerationCount();
 }
