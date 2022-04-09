@@ -86,41 +86,45 @@ function generateCells() {
     }
 }
 
-// make cells interactive
+// pause sim while drawing/erasing on canvas
 canvas.addEventListener('mousedown', function(m) {
     this.mouseDown = true;   
-    this.X = m.pageX ;
-    this.Y = m.pageY ;
     if (runSimInterval != 0) {
         this.paused = 1;  
         clearInterval(runSimInterval); // pause sim wile drawing if it was running
     }
 }, 0);
 
+// if sim was paused in above function, continue sim when mousebutton is no longer pressed
 canvas.addEventListener('mouseup', function() {
     this.mouseDown = false;  
     if (this.paused == 1) {
         runSimInterval = 0;
         this.paused = 0; 
-        startSim(); // continue sim if it was running before user started drawing
+        startSim();
     }
 }, 0);
 
-canvas.addEventListener('mousemove', function(m) {
-    var cRect = canvas.getBoundingClientRect();
-    var mouseX = Math.round(m.clientX - cRect.left);
-    var mouseY = Math.round(m.clientY - cRect.top);
-    if(this.mouseDown) {
-        for (i=0;i<cells.length;i++) {
-            var cell = cells[i];
-            if (mouseX > cell.x && mouseX < (cell.x + cellSize) && mouseY > cell.y && mouseY < (cell.y + cellSize) && cell.status == drawModeCheck) {
-                cell.status = drawModeFill;
-                //console.log(`clicked cell:${i} new status:${cell.status} nAlive:${cell.nAlive}`);
+
+// draw/erase live cells depending on the DrawMode
+['mousedown','mousemove'].forEach(event =>
+    canvas.addEventListener(event, function(m) {
+        var cRect = canvas.getBoundingClientRect();
+        var mouseX = Math.round(m.clientX - cRect.left);
+        var mouseY = Math.round(m.clientY - cRect.top);
+        if(this.mouseDown) {
+            for (i=0;i<cells.length;i++) {
+                var cell = cells[i];
+                if (mouseX > cell.x && mouseX < (cell.x + cellSize) && mouseY > cell.y && mouseY < (cell.y + cellSize) && cell.status == drawModeCheck) {
+                    cell.status = drawModeFill;
+                    //console.log(`clicked cell:${i} new status:${cell.status} nAlive:${cell.nAlive}`);
+                }
             }
+            generateCells();
         }
-        generateCells();
-    }
-})
+    })
+);
+
 
 // define neighbouring cells (horizontal, vertical and diagonal) and count the live ones
 function checkNeighbours() {
@@ -170,7 +174,12 @@ function nextGeneration() {
     generateCells();
 }
 
-// set status of all cells to 0 and re-generate them
+/* 
+stop running Sim,
+reset generations,
+reset all cells and regenerate them, 
+reset drawMode
+*/
 function clearCells() {
     stopSim();
     generations = 0;
@@ -185,6 +194,7 @@ function clearCells() {
     displayGenerationCount();
 }
 
+// start the Simulation with the Intervall set in simSpeed
 var runSimInterval = 0;
 function startSim() {
     if (runSimInterval == 0) {
@@ -192,6 +202,7 @@ function startSim() {
     }
 }
 
+// stop the Simulation
 function stopSim() {
     clearInterval(runSimInterval);
     runSimInterval = 0;
