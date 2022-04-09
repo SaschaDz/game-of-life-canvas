@@ -19,6 +19,25 @@ const genDisplay = document.getElementById("gens");
 var cells = [];
 var liveCells = 0;
 var simSpeed = 100;
+var drawModeCheck = 0;
+var drawModeFill = 1;
+const drawBtn = document.getElementById("draw");
+const eraseBtn = document.getElementById("erase");
+drawBtn.style.backgroundColor = "green";
+
+// switch between draw and erase mode
+drawBtn.addEventListener("click", function() {
+    drawModeCheck = 0;
+    drawModeFill = 1;
+    drawBtn.style.backgroundColor = "green";
+    eraseBtn.style.backgroundColor = "white";
+});
+eraseBtn.addEventListener("click", function() {
+    drawModeCheck = 1;
+    drawModeFill = 0;
+    eraseBtn.style.backgroundColor = "red";
+    drawBtn.style.backgroundColor = "white";
+});
 
 // show count of generations
 displayGenerationCount();
@@ -68,25 +87,42 @@ function generateCells() {
 }
 
 // make cells interactive
-canvas.addEventListener("click", function(e) { 
-    for (i=0;i<cells.length;i++) {
-        var cell = cells[i];
-        var cRect = canvas.getBoundingClientRect();
-        var mouseX = Math.round(e.clientX - cRect.left);
-        var mouseY = Math.round(e.clientY - cRect.top);
-        //document.getElementById("gens").innerText = `MouseX: ${mouseX} MouseY: ${mouseY} CellX: ${cell.x} CellX+W: ${cell.x+cellSize} cellY: ${cell.y} cellY+H: ${cell.y+cellSize}`;
-            if (mouseX > cell.x && mouseX < (cell.x + cellSize) && mouseY > cell.y && mouseY < (cell.y + cellSize)) {
-                if (cell.status == 0) {
-                    cell.status = 1;
-                } else
-                cell.status = 0;
+canvas.addEventListener('mousedown', function(m) {
+    this.mouseDown = true;   
+    this.X = m.pageX ;
+    this.Y = m.pageY ;
+    if (runSimInterval != 0) {
+        this.paused = 1;  
+        clearInterval(runSimInterval); // pause sim wile drawing if it was running
+    }
+}, 0);
+
+canvas.addEventListener('mouseup', function() {
+    this.mouseDown = false;  
+    if (this.paused == 1) {
+        runSimInterval = 0;
+        this.paused = 0; 
+        startSim(); // continue sim if it was running before user started drawing
+    }
+}, 0);
+
+canvas.addEventListener('mousemove', function(m) {
+    var cRect = canvas.getBoundingClientRect();
+    var mouseX = Math.round(m.clientX - cRect.left);
+    var mouseY = Math.round(m.clientY - cRect.top);
+    if(this.mouseDown) {
+        for (i=0;i<cells.length;i++) {
+            var cell = cells[i];
+            if (mouseX > cell.x && mouseX < (cell.x + cellSize) && mouseY > cell.y && mouseY < (cell.y + cellSize) && cell.status == drawModeCheck) {
+                cell.status = drawModeFill;
                 //console.log(`clicked cell:${i} new status:${cell.status} nAlive:${cell.nAlive}`);
-                generateCells();
             }
+        }
+        generateCells();
     }
 })
 
-// define neighbouring cells (horizontal, vertical and diagonal) and count the ones with status 1
+// define neighbouring cells (horizontal, vertical and diagonal) and count the live ones
 function checkNeighbours() {
     for (var i=0;i<cells.length-1;i++) {
         var cell = cells[i];
@@ -141,6 +177,10 @@ function clearCells() {
     for (var i=0;i<cells.length;i++) {
         cells[i].status = 0;
     }
+    drawModeCheck = 0;
+    drawModeFill = 1;
+    drawBtn.style.backgroundColor = "green";
+    eraseBtn.style.backgroundColor = "white";
     generateCells();
     displayGenerationCount();
 }
