@@ -64,7 +64,6 @@ function createCellsArray() {
     generateCells();
 }
 
-
 // create cells on canvas
 function generateCells() {
     liveCells = 0;
@@ -105,7 +104,6 @@ canvas.addEventListener('mouseup', function() {
     }
 }, 0);
 
-
 // draw/erase live cells depending on the DrawMode
 ['mousedown','mousemove'].forEach(event =>
     canvas.addEventListener(event, function(m) {
@@ -124,7 +122,6 @@ canvas.addEventListener('mouseup', function() {
         }
     })
 );
-
 
 // define neighbouring cells (horizontal, vertical and diagonal) and count the live ones
 function checkNeighbours() {
