@@ -29,6 +29,18 @@ const startBtn = document.getElementById("start");
 const pauseBtn = document.getElementById("pause");
 drawBtn.style.backgroundColor = "green";
 
+// change size of canvas to window size
+resizeCanvas();
+window.onresize = resizeCanvas;
+function resizeCanvas() {
+    canvas.height = document.querySelector("body").offsetHeight - document.querySelector("header").offsetHeight - document.querySelector(".controls").offsetHeight - document.querySelector("footer").offsetHeight;
+    if (document.querySelector("body").offsetWidth >= 1100) {
+        canvas.width = 1000;
+    } else {
+        canvas.width = document.querySelector("body").offsetWidth - 50;
+    }
+    generateCells();
+}
 
 // Eventlisteners for control buttons
 drawBtn.addEventListener("click", function() {
@@ -104,30 +116,35 @@ function generateCells() {
 }
 
 // pause sim while drawing/erasing on canvas
-canvas.addEventListener('mousedown', function(m) {
-    this.mouseDown = true;   
-    if (runSimInterval != 0) {
-        this.paused = 1;  
-        clearInterval(runSimInterval); // pause sim wile drawing if it was running
-    }
-}, 0);
+['mousedown','touchstart'].forEach(event =>
+    canvas.addEventListener(event, function() {
+        this.mouseDown = true;   
+        if (runSimInterval != 0) {
+            this.paused = 1;  
+            clearInterval(runSimInterval); // pause sim wile drawing if it was running
+        }
+    }, 0)
+);
 
 // if sim was paused in above function, continue sim when mousebutton is no longer pressed
-canvas.addEventListener('mouseup', function() {
-    this.mouseDown = false;  
-    if (this.paused == 1) {
-        runSimInterval = 0;
-        this.paused = 0; 
-        startSim();
-    }
-}, 0);
+['mouseup', 'touchend',].forEach(event =>
+    canvas.addEventListener(event, function() {
+        this.mouseDown = false;  
+        if (this.paused == 1) {
+            runSimInterval = 0;
+            this.paused = 0; 
+            startSim();
+        }
+    }, 0)
+);
+
 
 // draw/erase live cells depending on the DrawMode
-['mousedown','mousemove'].forEach(event =>
-    canvas.addEventListener(event, function(m) {
-        var cRect = canvas.getBoundingClientRect();
-        var mouseX = Math.round(m.clientX - cRect.left);
-        var mouseY = Math.round(m.clientY - cRect.top);
+['mousedown','mousemove','touchstart','touchmove'].forEach(event =>
+    canvas.addEventListener(event, function(e) {
+        var cSize = canvas.getBoundingClientRect();
+        var mouseX = e.clientX - cSize.left;
+        var mouseY = e.clientY - cSize.top;
         if(this.mouseDown) {
             for (i=0;i<cells.length;i++) {
                 var cell = cells[i];
