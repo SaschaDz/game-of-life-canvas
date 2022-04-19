@@ -33,9 +33,9 @@ drawBtn.style.backgroundColor = "green";
 resizeCanvas();
 window.onresize = resizeCanvas;
 function resizeCanvas() {
-    canvas.height = document.querySelector("body").offsetHeight - document.querySelector("header").offsetHeight - document.querySelector(".controls").offsetHeight - document.querySelector("footer").offsetHeight;
-    if (document.querySelector("body").offsetWidth >= 1100) {
-        canvas.width = 1000;
+    canvas.height = document.body.offsetHeight - document.querySelector("header").offsetHeight - document.querySelector(".controls").offsetHeight - document.querySelector("footer").offsetHeight -30;
+    if (document.querySelector("body").offsetWidth >= 1800) {
+        canvas.width = 1700;
     } else {
         canvas.width = document.querySelector("body").offsetWidth - 50;
     }
