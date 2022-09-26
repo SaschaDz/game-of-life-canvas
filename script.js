@@ -1,18 +1,11 @@
-/*
-To-Do:
-- persistent zoom
-- paning
-- make site responsive
-*/
-
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 const cellColorDead = "rgb(244, 244, 244)";
 const cellColorLive = "green";
 ctx.fillStyle = cellColorDead;
-var cellSize = 25;
-var cols = 100;
-var rows = 100;
+var cellSize = 15;
+var cols = 200;
+var rows = 200;
 var generations = 0;
 const genDisplay = document.getElementById("gens");
 var cells = [];
@@ -33,9 +26,9 @@ drawBtn.style.backgroundColor = "green";
 resizeCanvas();
 window.onresize = resizeCanvas;
 function resizeCanvas() {
-    canvas.height = document.querySelector("body").offsetHeight - document.querySelector("header").offsetHeight - document.querySelector(".controls").offsetHeight - document.querySelector("footer").offsetHeight;
-    if (document.querySelector("body").offsetWidth >= 1100) {
-        canvas.width = 1000;
+    canvas.height = document.querySelector("body").offsetHeight - document.querySelector("header").offsetHeight - document.querySelector(".controls").offsetHeight - 50;
+    if (document.querySelector("body").offsetWidth >= 2100) {
+        canvas.width = 2000;
     } else {
         canvas.width = document.querySelector("body").offsetWidth - 50;
     }
@@ -194,7 +187,7 @@ Here, John Comway's rules com into play:
 function nextGeneration() {
     generations++;
     displayGenerationCount();
-    for (const cell of cells) {
+    for (var cell of cells) {
         if (cell.nAlive < 2) {
             cell.status = 0;
         } else if (cell.nAlive >= 4) {
