@@ -179,18 +179,15 @@ function checkNeighbours() {
 /* 
 Determine a cell's status debending on the number of live neighbours.
 Here, John Comway's rules com into play:
-- Any live cell with less than 2 live neighbours dies.
+- Any live cell with less than 2 or more than 3 live neighbours dies.
 - Any live cell with 2 or 3 live neighbours survives.
-- Any live cell with more than 3 live neighbours dies.
 - Any dead cell with with 3 live neighbours becomes a live cell.
 */
 function nextGeneration() {
     generations++;
     displayGenerationCount();
     for (var cell of cells) {
-        if (cell.nAlive < 2) {
-            cell.status = 0;
-        } else if (cell.nAlive >= 4) {
+        if (cell.nAlive < 2 || cell.nAlive >= 4) {
             cell.status = 0;
         } else if (cell.nAlive == 3) {
             cell.status = 1;
