@@ -9,7 +9,6 @@ var rows = 200;
 var generations = 0;
 const genDisplay = document.getElementById("gens");
 var cells = [];
-var lastCells;
 var liveCells = 0;
 var simSpeed = 100;
 var drawModeCheck = 0;
@@ -90,7 +89,6 @@ function createCellsArray() {
 
 // create cells on canvas
 function generateCells() {
-    lastCells = liveCells;
     liveCells = 0;
     for (var i=0;i<cells.length-1;i++) {
         var cell = cells[i];
@@ -104,7 +102,7 @@ function generateCells() {
             ctx.fillStyle = cellColorDead;
             ctx.fill();
     }
-    if (liveCells == 0 ||  liveCells == lastCells) { // stop sim when all cells are dead or number of live cells does no longer change
+    if (liveCells == 0) { // stop sim when all cells are dead
         displayGenerationCount();
         stopSim();
     }
