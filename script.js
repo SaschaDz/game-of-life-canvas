@@ -247,19 +247,3 @@ function increaseSpeed() {
         startSim();
     }
 }
-
-function increaseCellSize() {
-    if (cellSize < 100 && runSimInterval == 0) {
-        cellSize += 5;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        createCellsArray();
-    }
-}
-
-function decreaseCellSize() {
-    if (cellSize > 10 && runSimInterval == 0) {
-        cellSize -= 5;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        createCellsArray();
-    }
-}
