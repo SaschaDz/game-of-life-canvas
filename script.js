@@ -177,8 +177,8 @@ function checkNeighbours() {
 }
 
 /* 
-Determine a cell's status debending on the number of live neighbours.
-Here, John Comway's rules com into play:
+Determine a cell's status depending on the number of live neighbours.
+Here, John Comway's rules come into play:
 - Any live cell with less than 2 or more than 3 live neighbours dies.
 - Any live cell with 2 or 3 live neighbours survives.
 - Any dead cell with with 3 live neighbours becomes a live cell.
